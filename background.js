@@ -1,5 +1,4 @@
 const WORKER_ENDPOINT = "https://job-lens.mehdihadizadeh-k.workers.dev";
-const DEFAULT_PRIORITY = "website_first";
 
 class StringUtils {
   static normalizeWebsite(raw) {
@@ -68,24 +67,13 @@ class ResultsManager {
 }
 
 class APIClient {
-  static async searchByWebsite(website) {
-    const url = `${WORKER_ENDPOINT}/?q=${encodeURIComponent(website)}`;
-    console.log(`Background: searchByWebsite -> ${url}`);
+  static async search(query) {
+    const url = `${WORKER_ENDPOINT}/?q=${encodeURIComponent(query)}`;
+    console.log(`Background: Searching for -> ${query}`);
 
     const response = await fetch(url);
     const result = await response.json();
-    console.log("Website search result:", result);
-
-    return result;
-  }
-
-  static async searchByName(name) {
-    const url = `${WORKER_ENDPOINT}/?q=${encodeURIComponent(name)}`;
-    console.log(`Background: searchByName -> ${url}`);
-
-    const response = await fetch(url);
-    const result = await response.json();
-    console.log("Name search result:", result);
+    console.log("Search result:", result);
 
     return result;
   }
@@ -123,167 +111,55 @@ class ExtensionBadgeManager {
   }
 }
 
-class SearchStrategy {
-  constructor(priority, normalizedWebsite, sanitizedName) {
-    this.priority = priority;
-    this.website = normalizedWebsite;
-    this.name = sanitizedName;
-    this.effectiveMode = this.determineEffectiveMode();
-  }
-
-  determineEffectiveMode() {
-    if (!this.website) {
-      if (
-        this.priority === "website_only" ||
-        this.priority === "website_first"
-      ) {
-        return { mode: "name_only", fallback: true };
-      }
-    }
-    return { mode: this.priority, fallback: false };
-  }
-
-  async execute() {
-    const searchInfo = {
-      configuredPriority: this.priority,
-      effectiveMode: this.effectiveMode.mode,
-      primaryUsed: null,
-      fallback: this.effectiveMode.fallback,
-    };
-
-    const strategies = {
-      website_only: () => this.executeWebsiteOnly(searchInfo),
-      name_only: () => this.executeNameOnly(searchInfo),
-      website_first: () => this.executeWebsiteFirst(searchInfo),
-      name_first: () => this.executeNameFirst(searchInfo),
-    };
-
-    const strategy =
-      strategies[this.effectiveMode.mode] || strategies.website_first;
-
-    return await strategy();
-  }
-
-  async executeWebsiteOnly(searchInfo) {
-    const result = await APIClient.searchByWebsite(this.website);
-    searchInfo.primaryUsed = "website";
-
-    return {
-      bestMatch: result.bestMatch,
-      combinedAll: result.allResults || [],
-      searchInfo,
-    };
-  }
-
-  async executeNameOnly(searchInfo) {
-    const result = await APIClient.searchByName(this.name);
-    searchInfo.primaryUsed = "name";
-
-    return {
-      bestMatch: result.bestMatch,
-      combinedAll: result.allResults || [],
-      searchInfo,
-    };
-  }
-
-  async executeWebsiteFirst(searchInfo) {
-    const websiteResult = await APIClient.searchByWebsite(this.website);
-
-    if (websiteResult.allResults?.length > 0) {
-      searchInfo.primaryUsed = "website";
-      const nameResult = await APIClient.searchByName(this.name);
-
-      const combinedAll = ResultsManager.mergeUniqueBySlug(
-        websiteResult.allResults,
-        nameResult.allResults || []
-      );
-
-      return {
-        bestMatch:
-          websiteResult.bestMatch ||
-          ResultsManager.findBestMatch(this.name, combinedAll),
-        combinedAll,
-        searchInfo,
-      };
-    } else {
-      searchInfo.primaryUsed = "name";
-      searchInfo.fallback = true;
-      const nameResult = await APIClient.searchByName(this.name);
-
-      return {
-        bestMatch: nameResult.bestMatch,
-        combinedAll: nameResult.allResults || [],
-        searchInfo,
-      };
-    }
-  }
-
-  async executeNameFirst(searchInfo) {
-    const nameResult = await APIClient.searchByName(this.name);
-
-    if (nameResult.allResults?.length > 0) {
-      searchInfo.primaryUsed = "name";
-
-      let combinedAll = nameResult.allResults;
-      if (this.website) {
-        const websiteResult = await APIClient.searchByWebsite(this.website);
-        combinedAll = ResultsManager.mergeUniqueBySlug(
-          nameResult.allResults,
-          websiteResult.allResults || []
-        );
-      }
-
-      return {
-        bestMatch: nameResult.bestMatch || combinedAll[0] || null,
-        combinedAll,
-        searchInfo,
-      };
-    } else if (this.website) {
-      searchInfo.primaryUsed = "website";
-      searchInfo.fallback = true;
-      const websiteResult = await APIClient.searchByWebsite(this.website);
-
-      return {
-        bestMatch: websiteResult.bestMatch,
-        combinedAll: websiteResult.allResults || [],
-        searchInfo,
-      };
-    }
-
-    return {
-      bestMatch: null,
-      combinedAll: [],
-      searchInfo,
-    };
-  }
-}
-
 class CompanyReviewService {
   static async findCompanyReviews(request, sender) {
     const currentHost = sender?.tab ? new URL(sender.tab.url).host : null;
 
-    const settings = await chrome.storage.sync.get([
-      "disabledSites",
-      "searchPriority",
-      "searchMode",
-    ]);
+    const settings = await chrome.storage.sync.get(["disabledSites"]);
 
     if (currentHost && settings.disabledSites?.includes(currentHost)) {
       console.log(`Background: Extension disabled on ${currentHost}`);
       return { status: "disabled" };
     }
 
-    const priority = this.determinePriority(settings);
     const normalizedWebsite = StringUtils.normalizeWebsite(request.website);
     const sanitizedName = StringUtils.sanitizeName(request.primaryName);
 
     try {
-      const strategy = new SearchStrategy(
-        priority,
-        normalizedWebsite,
-        sanitizedName
-      );
-      const { bestMatch, combinedAll, searchInfo } = await strategy.execute();
+      let bestMatch = null;
+      let combinedAll = [];
+      let searchInfo = {
+        primaryUsed: null,
+        fallback: false,
+      };
+
+      // Strategy: Search by website first, fallback to name only if no results
+      if (normalizedWebsite) {
+        const websiteResult = await APIClient.search(normalizedWebsite);
+
+        if (websiteResult.allResults?.length > 0) {
+          // Website search successful - use these results
+          searchInfo.primaryUsed = "website";
+          combinedAll = websiteResult.allResults;
+          bestMatch = websiteResult.bestMatch;
+        } else {
+          // Website search returned no results, fallback to name
+          searchInfo.primaryUsed = "name";
+          searchInfo.fallback = true;
+          const nameResult = await APIClient.search(sanitizedName);
+
+          combinedAll = nameResult.allResults || [];
+          bestMatch = nameResult.bestMatch;
+        }
+      } else {
+        // No website available, search by name only
+        searchInfo.primaryUsed = "name";
+        searchInfo.fallback = true;
+        const nameResult = await APIClient.search(sanitizedName);
+
+        combinedAll = nameResult.allResults || [];
+        bestMatch = nameResult.bestMatch;
+      }
 
       if (bestMatch) {
         return {
@@ -306,20 +182,6 @@ class CompanyReviewService {
         message: error.message || String(error),
       };
     }
-  }
-
-  static determinePriority(settings) {
-    if (settings.searchPriority) {
-      return settings.searchPriority;
-    }
-
-    if (settings.searchMode === "website") {
-      return "website_only";
-    } else if (settings.searchMode === "name") {
-      return "name_only";
-    }
-
-    return DEFAULT_PRIORITY;
   }
 }
 

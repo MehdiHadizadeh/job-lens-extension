@@ -3,13 +3,10 @@
 class PopupController {
   constructor() {
     this.elements = {
-      searchPriority: document.getElementById("search-priority"),
       openNotesBtn: document.getElementById("open-notes"),
       statusEnabled: document.getElementById("status-enabled"),
       statusDisabled: document.getElementById("status-disabled"),
     };
-
-    this.DEFAULT_PRIORITY = "website_first";
   }
 
   async init() {
@@ -19,15 +16,9 @@ class PopupController {
 
   async loadSettings() {
     try {
-      const {
-        searchPriority = this.DEFAULT_PRIORITY,
-        isExtensionEnabled = true,
-      } = await chrome.storage.sync.get([
-        "searchPriority",
-        "isExtensionEnabled",
-      ]);
+      const { isExtensionEnabled = true } = 
+        await chrome.storage.sync.get(["isExtensionEnabled"]);
 
-      this.elements.searchPriority.value = searchPriority;
       this.elements.statusEnabled.checked = isExtensionEnabled;
       this.elements.statusDisabled.checked = !isExtensionEnabled;
     } catch (error) {
@@ -36,32 +27,15 @@ class PopupController {
   }
 
   attachEventListeners() {
-    // Search priority change
-    this.elements.searchPriority.addEventListener("change", () =>
-      this.handlePriorityChange()
-    );
-
     // Extension status change
-    document
-      .querySelectorAll('input[name="extension-status"]')
-      .forEach((radio) => {
-        radio.addEventListener("change", (e) => this.handleStatusChange(e));
-      });
+    document.querySelectorAll('input[name="extension-status"]').forEach((radio) => {
+      radio.addEventListener("change", (e) => this.handleStatusChange(e));
+    });
 
     // Open notes page
-    this.elements.openNotesBtn.addEventListener("click", () =>
+    this.elements.openNotesBtn.addEventListener("click", () => 
       chrome.runtime.openOptionsPage()
     );
-  }
-
-  async handlePriorityChange() {
-    try {
-      await chrome.storage.sync.set({
-        searchPriority: this.elements.searchPriority.value,
-      });
-    } catch (error) {
-      console.error("Failed to save search priority:", error);
-    }
   }
 
   async handleStatusChange(event) {
