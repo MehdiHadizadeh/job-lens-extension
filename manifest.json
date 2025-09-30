@@ -2,8 +2,9 @@
   "manifest_version": 3,
   "name": "Job Lens | جاب لنز",
   "version": "1.0.0",
-  "description": "نمایش بررسی‌های شرکت‌ها در سایت‌های کاریابی ایران | View company reviews on Iranian job sites",
+  "description": "نمایش بررسی‌های شرکت‌ها در سایت‌های کاریابی ایران",
   "author": "Mehdi Hadizadeh",
+  "homepage_url": "https://github.com/MehdiHadizadeh/job-lens-extension",
   "icons": {
     "16": "icons/icon16.png",
     "32": "icons/icon32.png",
