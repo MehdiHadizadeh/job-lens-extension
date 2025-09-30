@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>تنظیمات جاب لنز</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="popup-body">
+    <header class="popup-header">
+      <h3>تنظیمات جاب لنز</h3>
+    </header>
+
+    <main class="popup-main">
+      <!-- Search Priority Section -->
+      <section class="section">
+        <label for="search-priority" class="section-label">
+          اولویت جستجو:
+        </label>
+        <select id="search-priority" class="select-input">
+          <option value="website_first">وبسایت → نام (پیش‌فرض)</option>
+          <option value="name_first">نام → وبسایت</option>
+          <option value="website_only">فقط وبسایت</option>
+          <option value="name_only">فقط نام</option>
+        </select>
+        <p class="warning-text">
+          ⚠️ جستجو فقط بر اساس نام یا وبسایت، می‌تواند دقت نتایج را کاهش دهد.
+        </p>
+      </section>
+
+      <!-- Extension Status Section -->
+      <section class="section">
+        <h4 class="section-title">وضعیت اکستنشن:</h4>
+        <div class="radio-group">
+          <label class="radio-label">
+            <input
+              type="radio"
+              id="status-enabled"
+              name="extension-status"
+              value="enabled"
+            />
+            <span>فعال</span>
+          </label>
+          <label class="radio-label">
+            <input
+              type="radio"
+              id="status-disabled"
+              name="extension-status"
+              value="disabled"
+            />
+            <span>غیرفعال</span>
+          </label>
+        </div>
+        <p class="warning-text">
+          ⚠️ غیرفعال کردن اکستنشن باعث می‌شود هیچ عملیاتی در سایت‌های هدف انجام
+          نشود.
+        </p>
+      </section>
+
+      <!-- Notes Management Section -->
+      <section class="section">
+        <h4 class="section-title">مدیریت یادداشت‌ها</h4>
+        <button id="open-notes" class="ext-btn-primary">
+          📝 مشاهده و ویرایش یادداشت‌ها
+        </button>
+      </section>
+    </main>
+
+    <footer class="popup-footer">
+      <a href="privacy.html" target="_blank" class="footer-link">
+        سیاست حفظ حریم خصوصی
+      </a>
+    </footer>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
