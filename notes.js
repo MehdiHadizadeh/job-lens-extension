@@ -75,15 +75,23 @@ class NoteItem {
 
   createContainer() {
     const div = document.createElement("div");
-    div.className = "note-item";
+    div.className = "note-item py-0";
     div.innerHTML = `
-      <h3>${this.noteData.companyName}</h3>
-      <p><a href="${this.noteData.jobUrl}" target="_blank">مشاهده آگهی</a></p>
-      <textarea>${this.noteData.note || ""}</textarea>
-      <div class="note-actions">
-        <button class="save ext-btn-primary">ذخیره</button>
-        <button class="delete ext-btn-danger">حذف</button>
+      <div class="company-note">
+        <h2>${this.noteData.companyName}</h2>
+        <div class="note-actions">
+          <button class="save ext-btn-primary">
+          <i class="fa-solid fa-check fs-5"></i>
+          ذخیره</button>
+          <button class="delete ext-btn-danger">
+          <i class="fa-solid fa-trash-can fs-5"></i>
+          حذف</button>
+        </div>
       </div>
+      <p class="mt-2 py-0 mb-0"><a class="fs-4" href="${this.noteData.jobUrl}" target="_blank">
+      <i class="fa-solid fa-arrow-up-right-from-square fs-5"></i>
+      مشاهده آگهی</a></p>
+      <textarea class="note-area">${this.noteData.note || ""}</textarea>
     `;
 
     this.textarea = div.querySelector("textarea");
