@@ -77,6 +77,49 @@ class APIClient {
 
     return result;
   }
+
+  static async submitFeedback(
+    searchQuery,
+    companySlug,
+    voteType,
+    previousVote
+  ) {
+    const url = `${WORKER_ENDPOINT}/feedback`;
+    console.log(
+      `Background: Submitting ${voteType} for ${companySlug} with query "${searchQuery}" (previous: ${previousVote})`
+    );
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          searchQuery,
+          companySlug,
+          type: voteType,
+          previousVote: previousVote || null,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log("Feedback result:", result);
+
+      if (result.status === "error") {
+        throw new Error(result.message || "Feedback submission failed");
+      }
+
+      return result;
+    } catch (error) {
+      console.error("Failed to submit feedback:", error);
+      throw error;
+    }
+  }
 }
 
 class ExtensionBadgeManager {
@@ -128,6 +171,7 @@ class CompanyReviewService {
     try {
       let bestMatch = null;
       let combinedAll = [];
+      let searchQuery = "";
       let searchInfo = {
         primaryUsed: null,
         fallback: false,
@@ -142,6 +186,7 @@ class CompanyReviewService {
           searchInfo.primaryUsed = "website";
           combinedAll = websiteResult.allResults;
           bestMatch = websiteResult.bestMatch;
+          searchQuery = websiteResult.searchQuery || normalizedWebsite;
         } else {
           // Website search returned no results, fallback to name
           searchInfo.primaryUsed = "name";
@@ -150,6 +195,7 @@ class CompanyReviewService {
 
           combinedAll = nameResult.allResults || [];
           bestMatch = nameResult.bestMatch;
+          searchQuery = nameResult.searchQuery || sanitizedName;
         }
       } else {
         // No website available, search by name only
@@ -159,6 +205,7 @@ class CompanyReviewService {
 
         combinedAll = nameResult.allResults || [];
         bestMatch = nameResult.bestMatch;
+        searchQuery = nameResult.searchQuery || sanitizedName;
       }
 
       if (bestMatch) {
@@ -167,12 +214,14 @@ class CompanyReviewService {
           data: bestMatch,
           all: combinedAll,
           searchInfo,
+          searchQuery,
         };
       } else {
         return {
           status: "not_found",
           all: combinedAll,
           searchInfo,
+          searchQuery,
         };
       }
     } catch (error) {
@@ -191,19 +240,46 @@ chrome.action.onClicked.addListener((tab) => {
 });
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.action !== "findCompanyReviews") return;
+  if (request.action === "findCompanyReviews") {
+    console.log("Background: findCompanyReviews request received.");
 
-  console.log("Background: findCompanyReviews request received.");
-
-  CompanyReviewService.findCompanyReviews(request, sender)
-    .then(sendResponse)
-    .catch((error) => {
-      console.error("Background: Unhandled error:", error);
-      sendResponse({
-        status: "error",
-        message: error.message || String(error),
+    CompanyReviewService.findCompanyReviews(request, sender)
+      .then(sendResponse)
+      .catch((error) => {
+        console.error("Background: Unhandled error:", error);
+        sendResponse({
+          status: "error",
+          message: error.message || String(error),
+        });
       });
-    });
 
-  return true; // Keep message channel open for async response
+    return true;
+  }
+
+  if (request.action === "submitFeedback") {
+    console.log("Background: submitFeedback request received.");
+
+    APIClient.submitFeedback(
+      request.searchQuery,
+      request.companySlug,
+      request.voteType,
+      request.previousVote
+    )
+      .then((result) => {
+        sendResponse({
+          status: "success",
+          likes: result.likes,
+          dislikes: result.dislikes,
+        });
+      })
+      .catch((error) => {
+        console.error("Background: Feedback submission error:", error);
+        sendResponse({
+          status: "error",
+          message: error.message || String(error),
+        });
+      });
+
+    return true;
+  }
 });
