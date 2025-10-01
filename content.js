@@ -478,6 +478,16 @@ class FloatingPanelUI {
     this.floatingBtn.addEventListener("click", () => {
       this.panel.classList.toggle("is-visible");
     });
+
+    document.addEventListener("click", (e) => {
+      if (
+        this.panel.classList.contains("is-visible") &&
+        !this.panel.contains(e.target) &&
+        e.target !== this.floatingBtn
+      ) {
+        this.panel.classList.remove("is-visible");
+      }
+    });
   }
 }
 
