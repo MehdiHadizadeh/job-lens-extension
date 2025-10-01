@@ -16,7 +16,6 @@ class PopupController {
     this.updateSubsiteTogglesState();
   }
 
-  // گرفتن ورژن از manifest.json
   setVersionFromManifest() {
     if (this.elements.versionEl) {
       const manifestData = chrome.runtime.getManifest();
