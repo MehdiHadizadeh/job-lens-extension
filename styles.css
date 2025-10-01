@@ -357,6 +357,17 @@ button:disabled {
   gap: 4px;
 }
 
+.info-text {
+  color: var(--color-text-medium);
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 0;
+  padding: 12px;
+  background-color: var(--color-bg-secondary);
+  border-radius: var(--radius-md);
+  border-right: 3px solid var(--color-primary);
+}
+
 /* ===================================
    Radio Group
    =================================== */
@@ -749,45 +760,118 @@ button:disabled {
    Privacy Page
    =================================== */
 .privacy-container {
-  max-width: 700px;
+  max-width: 800px;
   margin: 40px auto;
-  padding: 32px;
+  padding: 0;
   background-color: var(--color-white);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.privacy-container header {
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-primary-light) 100%
+  );
+  padding: 32px;
+  text-align: center;
 }
 
 .privacy-container h1 {
   font-size: 28px;
   font-weight: 700;
-  color: var(--color-primary);
-  text-align: center;
-  margin: 0 0 24px 0;
+  color: var(--color-white);
+  margin: 0;
+}
+
+.privacy-container main {
+  padding: 32px;
+}
+
+.privacy-container section {
+  margin-bottom: 32px;
+}
+
+.privacy-container section:last-child {
+  margin-bottom: 0;
 }
 
 .privacy-container h2 {
   font-size: 20px;
   font-weight: 600;
   color: var(--color-text-dark);
-  margin: 32px 0 16px 0;
-  padding-bottom: 8px;
+  margin: 0 0 16px 0;
+  padding-bottom: 12px;
   border-bottom: 2px solid var(--color-border-light);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .privacy-container p {
   line-height: 1.8;
   margin-bottom: 16px;
   color: var(--color-text-medium);
+  font-size: 14px;
+}
+
+.privacy-container p:last-child {
+  margin-bottom: 0;
+}
+
+.privacy-container p.highlight {
+  padding: 16px;
+  background-color: var(--color-bg-tertiary);
+  border-right: 4px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  font-weight: 500;
+}
+
+.privacy-container code {
+  padding: 2px 8px;
+  background-color: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-sm);
+  font-family: "Courier New", Courier, monospace;
+  font-size: 13px;
+  color: var(--color-primary);
 }
 
 .privacy-container ul {
   padding-right: 24px;
   line-height: 1.8;
   color: var(--color-text-medium);
+  margin: 16px 0;
 }
 
 .privacy-container ul li {
-  margin-bottom: 8px;
+  margin-bottom: 12px;
+  position: relative;
+}
+
+.privacy-container ul li::marker {
+  color: var(--color-primary);
+}
+
+.privacy-container strong {
+  color: var(--color-text-dark);
+  font-weight: 600;
+}
+
+.privacy-footer {
+  padding: 24px 32px;
+  background-color: var(--color-bg-secondary);
+  border-top: 1px solid var(--color-border-light);
+  text-align: center;
+}
+
+.privacy-footer p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-text-medium);
+  line-height: 1.6;
 }
 
 /* ===================================

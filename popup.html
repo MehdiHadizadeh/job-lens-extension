@@ -12,22 +12,6 @@
     </header>
 
     <main class="popup-main">
-      <!-- Search Priority Section -->
-      <section class="section">
-        <label for="search-priority" class="section-label">
-          اولویت جستجو:
-        </label>
-        <select id="search-priority" class="select-input">
-          <option value="website_first">وبسایت → نام (پیش‌فرض)</option>
-          <option value="name_first">نام → وبسایت</option>
-          <option value="website_only">فقط وبسایت</option>
-          <option value="name_only">فقط نام</option>
-        </select>
-        <p class="warning-text">
-          ⚠️ جستجو فقط بر اساس نام یا وبسایت، می‌تواند دقت نتایج را کاهش دهد.
-        </p>
-      </section>
-
       <!-- Extension Status Section -->
       <section class="section">
         <h4 class="section-title">وضعیت اکستنشن:</h4>
@@ -54,6 +38,16 @@
         <p class="warning-text">
           ⚠️ غیرفعال کردن اکستنشن باعث می‌شود هیچ عملیاتی در سایت‌های هدف انجام
           نشود.
+        </p>
+      </section>
+
+      <!-- Search Strategy Info -->
+      <section class="section">
+        <h4 class="section-title">نحوه جستجو</h4>
+        <p class="info-text">
+          جاب لنز ابتدا بر اساس <strong>وبسایت شرکت</strong> جستجو می‌کند. در
+          صورت عدم نتیجه، به صورت خودکار با <strong>نام شرکت</strong> جستجو
+          می‌کند.
         </p>
       </section>
 
