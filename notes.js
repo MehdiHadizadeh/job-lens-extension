@@ -75,15 +75,37 @@ class NoteItem {
 
   createContainer() {
     const div = document.createElement("div");
-    div.className = "note-item";
+    div.className = "note-item py-0";
     div.innerHTML = `
-      <h3>${this.noteData.companyName}</h3>
-      <p><a href="${this.noteData.jobUrl}" target="_blank">مشاهده آگهی</a></p>
-      <textarea>${this.noteData.note || ""}</textarea>
-      <div class="note-actions">
-        <button class="save ext-btn-primary">ذخیره</button>
-        <button class="delete ext-btn-danger">حذف</button>
+      <div class="company-note">
+        <h2>${this.noteData.companyName}</h2>
+        <div class="note-actions">
+          <button class="save ext-btn-primary">
+        <svg role="img" aria-label="ذخیره" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 3h11l5 5v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"></path>
+          <path d="M17 3v6H7V3"></path>
+          <rect x="7" y="12" width="10" height="7" rx="1"></rect>
+        </svg>
+
+          ذخیره</button>
+          <button class="delete ext-btn-danger">
+          <svg role="img" aria-label="حذف" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+            <path d="M10 11v6"></path>
+            <path d="M14 11v6"></path>
+            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path>
+          </svg>
+
+          حذف</button>
+        </div>
       </div>
+      <p class="mt-2 py-0 mb-0"><a class="fs-4" href="${this.noteData.jobUrl}" target="_blank">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 3h6v6"></path><path d="M10 14 21 3"></path><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+      </svg>
+      مشاهده آگهی</a></p>
+      <textarea class="note-area">${this.noteData.note || ""}</textarea>
     `;
 
     this.textarea = div.querySelector("textarea");
