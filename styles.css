@@ -218,13 +218,23 @@ button:disabled {
   padding: 3px 5px;
   font-size: 1rem;
   font-weight: normal;
+
+  img {
+    margin: 0;
+    padding: 0;
+  }
+
 }
 
 .ext-btn-primary:hover:not(:disabled) {
   background-color: var(--color-success);
-  color: var(--color-white);
+  color: var(--color-white); 
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
+
+  img{
+    filter: invert(1);
+  }
 }
 
 .ext-btn-primary:active {
@@ -234,9 +244,13 @@ button:disabled {
 
 .ext-btn-danger:hover:not(:disabled) {
   background-color: var(--color-error);
-  color: var(--color-white);
+  color: var(--color-white); 
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
+
+  img{
+    filter: invert(1);
+  }
 }
 
 .ext-btn-success {
@@ -413,28 +427,39 @@ button:disabled {
 
 .notes-container {
   max-width: 800px;
-  margin: 0 auto;
-  padding: 32px;
+  margin: 40px auto;
+  padding: 0 0 2rem 0;
   background-color: var(--color-white);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
+  overflow: hidden;
 }
 
-.notes-header {
+/* .notes-header {
   margin-bottom: 24px;
   padding-bottom: 20px;
   border-bottom: 2px solid var(--color-border-light);
+} */
+
+.notes-header{
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-primary-light) 100%
+  );
+  padding: 32px 0px 20px;
+  text-align: center;
 }
 
-.notes-header h2 {
-  color: var(--color-primary);
-  font-size: 24px;
+.notes-header h1 {
+  color: var(--color-white);
+  font-size: 28px;
   font-weight: 700;
   margin: 0 0 12px 0;
 }
 
 .notes-description {
-  color: var(--color-text-medium);
+  color: var(--color-bg-secondary);
   font-size: 14px;
   line-height: 1.6;
   margin: 0;
@@ -444,6 +469,7 @@ button:disabled {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  padding: 2rem ;
 }
 
 /* ===================================
@@ -457,7 +483,11 @@ button:disabled {
   box-shadow: var(--shadow-sm);
   transition: box-shadow var(--transition-base),
     transform var(--transition-base);
+    border-right: 3px solid var(--color-primary);
+    
 }
+
+
 
 .note-item:hover {
   box-shadow: var(--shadow-md);
@@ -756,6 +786,8 @@ button:disabled {
   border-radius: var(--radius-lg);
 }
 
+
+
 /* ===================================
    Privacy Page
    =================================== */
@@ -984,6 +1016,11 @@ button:disabled {
 .py-1 { padding-block: 8px; }
 .py-2 { padding-block: 16px; }
 .py-3 { padding-block: 24px; }
+
+
+.d-flex{
+  display: flex;
+}
 
 
 .hidden {

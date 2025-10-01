@@ -81,15 +81,15 @@ class NoteItem {
         <h2>${this.noteData.companyName}</h2>
         <div class="note-actions">
           <button class="save ext-btn-primary">
-          <i class="fa-solid fa-check fs-5"></i>
+          <img src="../icons/save.png" width="20" height="20">
           ذخیره</button>
           <button class="delete ext-btn-danger">
-          <i class="fa-solid fa-trash-can fs-5"></i>
+          <img src="../icons/bin.png" width="20" height="20">
           حذف</button>
         </div>
       </div>
-      <p class="mt-2 py-0 mb-0"><a class="fs-4" href="${this.noteData.jobUrl}" target="_blank">
-      <i class="fa-solid fa-arrow-up-right-from-square fs-5"></i>
+      <p class="mt-2 py-0 mb-0"><a class="fs-4 d-flex" href="${this.noteData.jobUrl}" target="_blank">
+      <img src="../icons/link.png" width="20" height="20">
       مشاهده آگهی</a></p>
       <textarea class="note-area">${this.noteData.note || ""}</textarea>
     `;
