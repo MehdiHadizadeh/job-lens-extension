@@ -8,8 +8,14 @@ class JobReviewsExtension {
   }
 
   async init() {
-    const { isExtensionEnabled = true } = await chrome.storage.sync.get([
+    const {
+      isExtensionEnabled = true,
+      isJobinjaEnabled = true,
+      isJobvisionEnabled = true,
+    } = await chrome.storage.sync.get([
       "isExtensionEnabled",
+      "isJobinjaEnabled",
+      "isJobvisionEnabled",
     ]);
 
     if (!isExtensionEnabled) {
@@ -17,20 +23,32 @@ class JobReviewsExtension {
       return;
     }
 
+    // Mapping host to site toggle status
+    const siteStatusMap = {
+      "jobinja.ir": isJobinjaEnabled,
+      "jobvision.ir": isJobvisionEnabled,
+    };
+
     window.addEventListener("load", () => {
       console.log("Job Lens Extension active on:", this.host);
-      this.routeHandler();
+
+      const handlerEntry = Object.entries(this.handlers).find(([domain]) =>
+        this.host.includes(domain)
+      );
+
+      if (handlerEntry) {
+        const [domain, handler] = handlerEntry;
+
+        if (siteStatusMap[domain]) {
+          console.log(`Handler for ${domain} is enabled. Executing...`);
+          handler();
+        } else {
+          console.log(`Handler for ${domain} is disabled via settings.`);
+        }
+      } else {
+        console.log("No specific handler for this site.");
+      }
     });
-  }
-
-  routeHandler() {
-    const handler = Object.entries(this.handlers).find(([domain]) =>
-      this.host.includes(domain)
-    );
-
-    if (handler) {
-      handler[1]();
-    }
   }
 
   handleJobinja() {

@@ -8,62 +8,56 @@
   </head>
   <body class="popup-body">
     <header class="popup-header">
-      <h3>تنظیمات جاب لنز</h3>
+      <h3>جاب لنز</h3>
     </header>
 
     <main class="popup-main">
       <!-- Extension Status Section -->
+
       <section class="section">
-        <h4 class="section-title">وضعیت اکستنشن:</h4>
-        <div class="radio-group">
-          <label class="radio-label">
-            <input
-              type="radio"
-              id="status-enabled"
-              name="extension-status"
-              value="enabled"
-            />
-            <span>فعال</span>
-          </label>
-          <label class="radio-label">
-            <input
-              type="radio"
-              id="status-disabled"
-              name="extension-status"
-              value="disabled"
-            />
-            <span>غیرفعال</span>
+        <div class="section-wrapper">
+          <h4 class="section-title">جاب لنز</h4>
+          <label class="toggle-switch">
+            <input type="checkbox" id="extension-toggle" />
+            <span class="slider"></span>
           </label>
         </div>
-        <p class="warning-text">
-          ⚠️ غیرفعال کردن اکستنشن باعث می‌شود هیچ عملیاتی در سایت‌های هدف انجام
-          نشود.
-        </p>
+
+        <div class="section-wrapper">
+          <h4 class="section-title">جابینجا | jobinja.ir</h4>
+          <label class="toggle-switch">
+            <input type="checkbox" id="jobinja-toggle" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="section-wrapper">
+          <h4 class="section-title">جاب ویژن | jobvision.ir</h4>
+          <label class="toggle-switch">
+            <input type="checkbox" id="jobvision-toggle" />
+            <span class="slider"></span>
+          </label>
+        </div>
       </section>
 
       <!-- Search Strategy Info -->
-      <section class="section">
-        <h4 class="section-title">نحوه جستجو</h4>
-        <p class="info-text">
-          جاب لنز ابتدا بر اساس <strong>وبسایت شرکت</strong> جستجو می‌کند. در
-          صورت عدم نتیجه، به صورت خودکار با <strong>نام شرکت</strong> جستجو
-          می‌کند.
-        </p>
-      </section>
+      <p class="info-text">
+        جاب لنز ابتدا بر اساس <strong>آدرس وب سایت شرکت</strong> جستجو می‌کند.
+        در صورت عدم نتیجه، به صورت خودکار با <strong>نام شرکت</strong> جستجو
+        می‌کند.
+      </p>
 
       <!-- Notes Management Section -->
-      <section class="section">
-        <h4 class="section-title">مدیریت یادداشت‌ها</h4>
-        <button id="open-notes" class="ext-btn-primary">
-          📝 مشاهده و ویرایش یادداشت‌ها
-        </button>
-      </section>
+      <button id="open-notes" class="ext-btn-primary w-100">
+        مشاهده و ویرایش یادداشت‌ها
+      </button>
     </main>
 
     <footer class="popup-footer">
       <a href="privacy.html" target="_blank" class="footer-link">
         سیاست حفظ حریم خصوصی
       </a>
+
+      <span id="extension-version" class="extension-version"></span>
     </footer>
 
     <script src="popup.js"></script>
