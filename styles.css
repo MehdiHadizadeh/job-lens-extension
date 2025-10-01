@@ -158,7 +158,6 @@ button {
   font-family: inherit;
   font-size: 13px;
   font-weight: 500;
-  min-width: 70px;
   padding: 8px 16px;
   border: none;
   border-radius: var(--radius-md);
@@ -183,13 +182,10 @@ button:disabled {
 
 .ext-btn-primary:hover:not(:disabled) {
   background-color: var(--color-primary-hover);
-  transform: translateY(-1px);
+  /* transform: translateY(-1px); */
   box-shadow: var(--shadow-md);
 }
 
-.ext-btn-primary:active {
-  transform: translateY(0);
-}
 
 .ext-btn-danger {
   background-color: var(--color-error);
@@ -198,7 +194,6 @@ button:disabled {
 
 .ext-btn-danger:hover:not(:disabled) {
   background-color: var(--color-error-hover);
-  transform: translateY(-1px);
   box-shadow: var(--shadow-md);
 }
 
@@ -310,15 +305,6 @@ button:disabled {
   margin: 0 0 12px 0;
 }
 
-.warning-text {
-  color: var(--color-error);
-  font-size: 12px;
-  margin-top: 8px;
-  line-height: 1.5;
-  display: flex;
-  align-items: flex-start;
-  gap: 4px;
-}
 
 .info-text {
   color: var(--color-text-medium);
@@ -329,6 +315,7 @@ button:disabled {
   background-color: var(--color-bg-secondary);
   border-radius: var(--radius-md);
   border-right: 3px solid var(--color-primary);
+  margin-bottom: 16px;
 }
 
 /* ===================================
@@ -343,6 +330,7 @@ button:disabled {
 .radio-label {
   display: flex;
   align-items: center;
+  gap: 4px;
   cursor: pointer;
   padding: 8px 12px;
   border-radius: var(--radius-md);
@@ -424,7 +412,6 @@ button:disabled {
 
 .note-item:hover {
   box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
 }
 
 .note-item h3 {
@@ -482,7 +469,7 @@ button:disabled {
   gap: 8px;
 
   height: 42px;
-  padding: 0 20px;
+  padding: 0 24px;
 
   background: linear-gradient(
     135deg,
@@ -519,9 +506,9 @@ button:disabled {
   right: 60px;
   z-index: var(--z-floating-panel);
 
-  width: 420px;
+  width: 360px;
   max-height: 85vh;
-  padding: 20px;
+  padding: 16px;
 
   background-color: var(--color-white);
   border: 1px solid var(--color-border-medium);
@@ -567,18 +554,13 @@ button:disabled {
    Review Card
    =================================== */
 .ext-review-card {
-  padding: 16px;
+  padding: 8px;
   margin-bottom: 16px;
   background-color: var(--color-white);
   border: 1px solid var(--color-border-light);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-sm);
   transition: all var(--transition-base);
-}
-
-.ext-review-card:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
 }
 
 .ext-review-card:last-child {
@@ -590,7 +572,7 @@ button:disabled {
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
 .ext-company-name {
@@ -604,8 +586,8 @@ button:disabled {
 .ext-rating-badge {
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 6px 12px;
+  gap: 4px;
+  padding: 0 8px;
   border-radius: var(--radius-full);
   font-size: 14px;
   font-weight: 700;
@@ -613,11 +595,72 @@ button:disabled {
   flex-shrink: 0;
 }
 
+.ext-feedback-buttons-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Feedback Section */
+.ext-feedback-section {
+  display: grid;
+  align-items: center;
+}
+
+.ext-feedback-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0;
+  background-color: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--color-text-medium);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.ext-feedback-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ext-feedback-btn svg {
+  flex-shrink: 0;
+}
+
+.ext-feedback-count {
+  font-weight: 600;
+  min-width: 20px;
+  text-align: center;
+}
+
+.ext-feedback-like.active {
+  color: var(--rating-high);
+}
+
+.ext-feedback-like.active svg {
+  fill: var(--rating-high);
+}
+
+.ext-feedback-dislike.active {
+  color: var(--rating-low);
+}
+
+.ext-feedback-dislike.active svg {
+  fill: var(--rating-low);
+}
+
 .ext-action-button {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+
+  width: 100%;
 
   padding: 10px 16px;
 
@@ -637,7 +680,6 @@ button:disabled {
   background-color: var(--color-primary);
   color: var(--color-white);
   border-color: var(--color-primary);
-  transform: translateY(-1px);
   box-shadow: var(--shadow-md);
 }
 
@@ -649,8 +691,8 @@ button:disabled {
    Notes Section (in Panel)
    =================================== */
 .ext-notes-section {
-  margin-top: 20px;
-  padding-top: 20px;
+  margin-top: 16px;
+  padding-top: 16px;
   border-top: 2px dashed var(--color-border-light);
 }
 
@@ -679,7 +721,7 @@ button:disabled {
    Info & Messages
    =================================== */
 .ext-search-method-info {
-  padding: 10px 14px;
+  padding: 6px 12px;
   margin-bottom: 16px;
 
   font-size: 12px;
@@ -696,7 +738,7 @@ button:disabled {
 }
 
 .ext-not-found-message {
-  padding: 16px 20px;
+  padding: 16px;
   margin-bottom: 12px;
 
   font-size: 14px;
@@ -856,11 +898,6 @@ button:disabled {
   .ext-floating-panel {
     right: 50px;
   }
-
-  .radio-group {
-    flex-direction: column;
-    gap: 8px;
-  }
 }
 
 /* ===================================
@@ -902,4 +939,8 @@ button:disabled {
 
 .visible {
   display: block !important;
+}
+
+.w-100 {
+  width: 100%;
 }

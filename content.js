@@ -1,4 +1,3 @@
-
 class JobReviewsExtension {
   constructor() {
     this.host = window.location.host;
@@ -14,12 +13,12 @@ class JobReviewsExtension {
     ]);
 
     if (!isExtensionEnabled) {
-      console.log("Job Reviews Extension is globally disabled.");
+      console.log("Job Lens Extension is globally disabled.");
       return;
     }
 
     window.addEventListener("load", () => {
-      console.log("Job Reviews Extension active on:", this.host);
+      console.log("Job Lens Extension active on:", this.host);
       this.routeHandler();
     });
   }
@@ -141,14 +140,27 @@ class FloatingPanelUI {
   constructor(response, fallbackName) {
     this.response = response;
     this.fallbackName = fallbackName;
+    this.searchQuery = response.searchQuery || ""; // Store the normalized search query
     this.floatingBtn = null;
     this.panel = null;
+    this.userVotes = {}; // Will store user's votes from storage
   }
 
-  render() {
+  async render() {
+    await this.loadUserVotes();
     this.createButton();
     this.createPanel();
     this.attachEventListeners();
+  }
+
+  async loadUserVotes() {
+    try {
+      const result = await chrome.storage.local.get(["companyVotes"]);
+      this.userVotes = result.companyVotes || {};
+    } catch (error) {
+      console.error("Failed to load user votes:", error);
+      this.userVotes = {};
+    }
   }
 
   createButton() {
@@ -178,6 +190,7 @@ class FloatingPanelUI {
     const methodMap = {
       website: "آدرس وب سایت شرکت",
       name: "نام کامل شرکت",
+      fallback: "آدرس و نام شرکت",
     };
 
     const method = methodMap[searchInfo.primaryUsed];
@@ -228,6 +241,7 @@ class FloatingPanelUI {
   createCompanyCard(company) {
     const card = document.createElement("div");
     card.className = "ext-review-card";
+    card.dataset.slug = company.slug;
 
     const rating = company.rating || 0;
     const { color, bgColor } = this.getRatingColors(rating);
@@ -241,18 +255,25 @@ class FloatingPanelUI {
     companyName.textContent = company.name || "—";
 
     const ratingBadge = document.createElement("span");
-    ratingBadge.className = "ext-rating-badge";
-    ratingBadge.style.color = color;
-    ratingBadge.style.backgroundColor = bgColor;
-    ratingBadge.innerHTML = `
+    if (rating) {
+      ratingBadge.className = "ext-rating-badge";
+      ratingBadge.style.color = color;
+      ratingBadge.style.backgroundColor = bgColor;
+      ratingBadge.innerHTML = `
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path>
       </svg>
       ${rating ? Number(rating).toFixed(2) : "—"}
     `;
+    }
 
     header.appendChild(companyName);
-    header.appendChild(ratingBadge);
+    if (rating) {
+      header.appendChild(ratingBadge);
+    }
+
+    // Create feedback section
+    const feedbackSection = this.createFeedbackSection(company);
 
     // Create link
     const link = document.createElement("a");
@@ -267,10 +288,156 @@ class FloatingPanelUI {
       مشاهده در ویکی‌تجربه
     `;
 
+    const mainActionRow = document.createElement("div");
+    mainActionRow.className = "ext-feedback-buttons-wrapper";
+
+    mainActionRow.appendChild(link);
+    mainActionRow.appendChild(feedbackSection);
+
     card.appendChild(header);
-    card.appendChild(link);
+    card.appendChild(mainActionRow);
 
     return card;
+  }
+
+  createFeedbackSection(company) {
+    const section = document.createElement("div");
+    section.className = "ext-feedback-section";
+
+    // Create a unique vote key based on search query + company slug
+    const voteKey = `${this.searchQuery}:${company.slug}`;
+    const userVote = this.userVotes[voteKey];
+    const likes = company.likes || 0;
+    const dislikes = company.dislikes || 0;
+
+    // Like button
+    const likeBtn = document.createElement("button");
+    likeBtn.className = "ext-feedback-btn ext-feedback-like";
+    likeBtn.dataset.slug = company.slug;
+    likeBtn.dataset.type = "like";
+    likeBtn.dataset.voteKey = voteKey;
+    if (userVote === "like") {
+      likeBtn.classList.add("active");
+    }
+    likeBtn.innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M7 10v12"></path>
+        <path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2h0a3.13 3.13 0 0 1 3 3.88Z"></path>
+      </svg>
+      <span class="ext-feedback-count">${likes}</span>
+    `;
+
+    // Dislike button
+    const dislikeBtn = document.createElement("button");
+    dislikeBtn.className = "ext-feedback-btn ext-feedback-dislike";
+    dislikeBtn.dataset.slug = company.slug;
+    dislikeBtn.dataset.type = "dislike";
+    dislikeBtn.dataset.voteKey = voteKey;
+    if (userVote === "dislike") {
+      dislikeBtn.classList.add("active");
+    }
+    dislikeBtn.innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 14V2"></path>
+        <path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22h0a3.13 3.13 0 0 1-3-3.88Z"></path>
+      </svg>
+      <span class="ext-feedback-count">${dislikes}</span>
+    `;
+
+    section.appendChild(likeBtn);
+    section.appendChild(dislikeBtn);
+
+    // Attach event listeners
+    likeBtn.addEventListener("click", () =>
+      this.handleFeedback(company.slug, "like", likeBtn)
+    );
+    dislikeBtn.addEventListener("click", () =>
+      this.handleFeedback(company.slug, "dislike", dislikeBtn)
+    );
+
+    return section;
+  }
+
+  async handleFeedback(companySlug, voteType, button) {
+    const card = button.closest(".ext-review-card");
+    const allButtons = card.querySelectorAll(".ext-feedback-btn");
+
+    // Get vote key from button (query:slug)
+    const voteKey = button.dataset.voteKey;
+
+    // Get current user vote for this specific query+slug combination
+    const currentVote = this.userVotes[voteKey];
+
+    // Determine the new vote state
+    let newVote = null;
+    if (currentVote === voteType) {
+      // User is un-voting (clicking same button again)
+      newVote = null;
+    } else {
+      // User is voting (first time or changing vote)
+      newVote = voteType;
+    }
+
+    // Disable all buttons during request
+    allButtons.forEach((btn) => (btn.disabled = true));
+
+    try {
+      // Send feedback to background with search query and previous vote info
+      const response = await new Promise((resolve) => {
+        chrome.runtime.sendMessage(
+          {
+            action: "submitFeedback",
+            searchQuery: this.searchQuery,
+            companySlug,
+            voteType,
+            previousVote: currentVote || null,
+          },
+          resolve
+        );
+      });
+
+      if (response.status === "success") {
+        // Update user's vote in storage using the query:slug key
+        if (newVote === null) {
+          // Remove vote from storage
+          delete this.userVotes[voteKey];
+        } else {
+          // Store new vote with query:slug key
+          this.userVotes[voteKey] = newVote;
+        }
+        await chrome.storage.local.set({ companyVotes: this.userVotes });
+
+        // Update UI - remove active from all buttons in this card
+        allButtons.forEach((btn) => btn.classList.remove("active"));
+
+        // Add active to current button only if it's a new vote (not un-vote)
+        if (newVote !== null) {
+          button.classList.add("active");
+        }
+
+        // Update counts from response
+        const likeBtn = card.querySelector('[data-type="like"]');
+        const dislikeBtn = card.querySelector('[data-type="dislike"]');
+
+        if (likeBtn && response.likes !== undefined) {
+          likeBtn.querySelector(".ext-feedback-count").textContent =
+            response.likes;
+        }
+        if (dislikeBtn && response.dislikes !== undefined) {
+          dislikeBtn.querySelector(".ext-feedback-count").textContent =
+            response.dislikes;
+        }
+      } else {
+        console.error("Feedback submission failed:", response.message);
+        alert("خطا در ثبت نظر. لطفاً دوباره تلاش کنید.");
+      }
+    } catch (error) {
+      console.error("Failed to submit feedback:", error);
+      alert("خطا در ثبت نظر. لطفاً دوباره تلاش کنید.");
+    } finally {
+      // Re-enable buttons
+      allButtons.forEach((btn) => (btn.disabled = false));
+    }
   }
 
   getRatingColors(rating) {
@@ -363,13 +530,8 @@ class NotesSection {
     const noteContent = this.textarea.value.trim();
 
     try {
-      if (noteContent) {
-        await this.saveNote(noteContent);
-        this.showFeedback("ذخیره شد ✓", "ext-btn-primary");
-      } else {
-        await this.deleteNote();
-        this.showFeedback("حذف شد 🗑️", "ext-btn-danger");
-      }
+      await this.saveNote(noteContent);
+      this.showFeedback("ذخیره شد ✓", "ext-btn-primary");
     } catch (error) {
       console.error("Failed to save note:", error);
       this.showFeedback("خطا در ذخیره", "ext-btn-danger");
